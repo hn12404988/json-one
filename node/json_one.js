@@ -40,14 +40,21 @@ module.exports = class jsonOne{
     }
   }
 
+  ignore_space(jsonString){
+    while(jsonString[this.i] === ' '){
+      this.i++;
+    }
+  }
+
   to_object(jsonString) {
     var ss = {};
     if(jsonString == "" || jsonString == "{}"){
       return ss;
     }
     this.i = 1;
+    this.ignore_space(jsonString);
     while(jsonString[this.i] !== undefined){
-      if(jsonString[this.i] != '"'){
+      if(jsonString[this.i] !== '"'){
         return false;
       }
       this.j = this.i + 1;
@@ -58,9 +65,7 @@ module.exports = class jsonOne{
       }
       this.str = jsonString.substr(this.j, this.i - this.j - 1);
       this.i++;
-      while(jsonString[this.i] == ' '){
-        this.i++;
-      }
+      this.ignore_space(jsonString);
       this.j = this.i;
       if(jsonString[this.i] == '{'){
         this.json_to_end(jsonString);
@@ -99,16 +104,29 @@ module.exports = class jsonOne{
           }
         }
         this.outcome = jsonString.substr(this.j, this.i - this.j);
-        if(jsonString[this.i + 1] === '}'){
-          ss[this.str] = this.outcome;
-          return ss;
-        }
       }
       else{
-        return false;
+        while(jsonString[this.i] !== ',' && jsonString[this.i] !== undefined){
+          this.i++;
+        }
+        this.i--;
+        if(this.j === this.i){
+          return false;
+        }
+        this.outcome = jsonString.substr(this.j, this.i - this.j + 1);
+        try{
+          this.outcome = parseInt(this.outcome);
+        }
+        catch(err){}
       }
       ss[this.str] = this.outcome;
-      this.i += 2;
+      if(jsonString[this.i + 1] === '}'){
+        break;
+      }
+      else if(jsonString[this.i + 1] === ','){
+        this.i += 2;
+        this.ignore_space(jsonString);
+      }
     }
     return ss;
   }
