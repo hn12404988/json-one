@@ -1,0 +1,13 @@
+auto-save-list
+.org-id-locations
+\#*
+org-mode-config.el
+*~
+.#*
+\#*\#
+*.o
+*.pyc
+*.socket
+*.log
+*.sh
+.DS_Store
